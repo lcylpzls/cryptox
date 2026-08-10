@@ -1,6 +1,8 @@
 package cryptox
 
 import (
+	"bytes"
+	"io"
 	"testing"
 )
 
@@ -17,5 +19,21 @@ func FuzzOpen(f *testing.F) {
 	f.Add([]byte{0xff, 0xfe, 0xfd})
 	f.Fuzz(func(t *testing.T, data []byte) {
 		_, _ = Open(testKEK, data)
+	})
+}
+
+// FuzzDecryptStream 验证任意密文流字节输入下解密不 panic、不越界。
+func FuzzDecryptStream(f *testing.F) {
+	var buf bytes.Buffer
+	if err := EncryptStream(testKEK, &buf, bytes.NewReader(bytes.Repeat([]byte("S"), streamChunkSize+7))); err != nil {
+		f.Fatal(err)
+	}
+	stream := buf.Bytes()
+	f.Add(stream)
+	f.Add(stream[:streamHeaderSize])
+	f.Add([]byte{})
+	f.Add([]byte{0xff, 0xfe})
+	f.Fuzz(func(t *testing.T, data []byte) {
+		_ = DecryptStream(testKEK, io.Discard, bytes.NewReader(data))
 	})
 }

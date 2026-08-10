@@ -1,5 +1,22 @@
 # 更新日志
 
+## [v0.2.0] - 2026-08-10
+
+### 新增
+
+- 分块 AEAD 流式加解密：`EncryptStream` / `DecryptStream`；
+- 64 KiB 分块 AES-256-GCM，内存占用有界，适合大文件；
+- 流头部携带 KEK/DEK 信封与流随机数，块 nonce 由计数器派生，
+  同一流内保证唯一；
+- 块格式自描述（4B 长度 + 密文），空流合法；
+- 错误码：`CRYPTOX_INVALID_STREAM` / `CRYPTOX_STREAM_READ_FAILED` /
+  `CRYPTOX_STREAM_WRITE_FAILED`；
+- `FuzzDecryptStream` 接入 CI。
+
+### 质量
+
+- 根包语句覆盖率 100%；race / vet / staticcheck / fuzz / govulncheck 全绿。
+
 ## [v0.1.0] - 2026-08-10
 
 ### 新增

@@ -14,6 +14,12 @@ const (
 	CodeUnsupportedVersion errx.Code = "CRYPTOX_UNSUPPORTED_VERSION"
 	// CodeDecryptFailed 解密失败（不区分密钥错误与篡改）。
 	CodeDecryptFailed errx.Code = "CRYPTOX_DECRYPT_FAILED"
+	// CodeInvalidStream 加密流头部或块格式非法。
+	CodeInvalidStream errx.Code = "CRYPTOX_INVALID_STREAM"
+	// CodeStreamReadFailed 读取明文或密文流失败。
+	CodeStreamReadFailed errx.Code = "CRYPTOX_STREAM_READ_FAILED"
+	// CodeStreamWriteFailed 写入密文或明文流失败。
+	CodeStreamWriteFailed errx.Code = "CRYPTOX_STREAM_WRITE_FAILED"
 )
 
 func init() {
@@ -27,4 +33,10 @@ func init() {
 	errx.RegisterCodeKind(CodeUnsupportedVersion, errx.KindInvalid)
 	errx.RegisterCode(CodeDecryptFailed, "解密失败")
 	errx.RegisterCodeKind(CodeDecryptFailed, errx.KindDataLoss)
+	errx.RegisterCode(CodeInvalidStream, "加密流头部或块格式非法")
+	errx.RegisterCodeKind(CodeInvalidStream, errx.KindInvalid)
+	errx.RegisterCode(CodeStreamReadFailed, "读取明文或密文流失败")
+	errx.RegisterCodeKind(CodeStreamReadFailed, errx.KindUnavailable)
+	errx.RegisterCode(CodeStreamWriteFailed, "写入密文或明文流失败")
+	errx.RegisterCodeKind(CodeStreamWriteFailed, errx.KindUnavailable)
 }

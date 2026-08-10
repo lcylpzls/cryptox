@@ -5,7 +5,7 @@
 | 版本 | 内容 | 状态 |
 | --- | --- | --- |
 | v0.1.0 | 信封加密核心：Seal/Open、KEK/DEK、版本化信封、fuzz | 进行中 |
-| v0.2.0 | 分块 AEAD 流式加解密：EncryptStream/DecryptStream | 计划 |
+| v0.2.0 | 分块 AEAD 流式加解密：EncryptStream/DecryptStream | 完成 |
 | v0.3.0 | 对称认证：HMAC 签名/验签、常量时间比较、SHA256 摘要 | 计划 |
 | v0.4.0 | 非对称签名：Ed25519 密钥/签名/验签 | 计划 |
 | v0.5.0 | 密钥管理：HKDF/PBKDF2、RandomBytes、Wipe、轮换辅助 | 计划 |

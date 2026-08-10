@@ -113,6 +113,7 @@ jobs:
       - name: Fuzz short run (5s per target)
         run: |
           go test -run '^$' -fuzz '^FuzzOpen$' -fuzztime=5s .
+          go test -run '^$' -fuzz '^FuzzDecryptStream$' -fuzztime=5s .
 
   vulncheck:
     runs-on: ubuntu-latest

@@ -1,8 +1,8 @@
 # API 快照
 
-> 随版本更新。v0.1.0 快照如下；新版本发布后同步替换。
+> 随版本更新。v0.2.0 快照如下；新版本发布后同步替换。
 
-## v0.1.0
+## v0.2.0
 
 ### 信封加密
 
@@ -24,6 +24,26 @@ magic "CRX1" (4B) | version (1B) | algorithm (1B) | payloadLen (4B)
 keyNonce (12B) | dataNonce (12B) | wrappedDEK (48B) | ciphertext
 ```
 
+### 流式加解密
+
+```go
+func EncryptStream(kek []byte, dst io.Writer, src io.Reader) error
+func DecryptStream(kek []byte, dst io.Writer, src io.Reader) error
+```
+
+- 分块 AES-256-GCM（64 KiB/块），内存占用有界，适合大文件；
+- 流头部携带 KEK/DEK 信封与流随机数，块 nonce 由计数器派生；
+- 块格式：`[4B 长度][密文+标签]`；空流合法；
+- 块认证失败统一返回 `CRYPTOX_DECRYPT_FAILED`。
+
+### 流格式（v1）
+
+```text
+头部：magic "CRX1" | version | algorithm | chunkSize (4B)
+      keyNonce (12B) | streamNonce (12B) | wrappedDEK (48B)
+数据：块序列，每块 [4B 密文长度][密文+标签]
+```
+
 ### 错误码
 
 | 错误码 | 分类 | 含义 |
@@ -33,3 +53,6 @@ keyNonce (12B) | dataNonce (12B) | wrappedDEK (48B) | ciphertext
 | `CRYPTOX_INVALID_ENVELOPE` | invalid | 信封格式非法 |
 | `CRYPTOX_UNSUPPORTED_VERSION` | invalid | 信封版本或算法不受支持 |
 | `CRYPTOX_DECRYPT_FAILED` | data_loss | 解密失败 |
+| `CRYPTOX_INVALID_STREAM` | invalid | 加密流头部或块格式非法 |
+| `CRYPTOX_STREAM_READ_FAILED` | unavailable | 读取明文或密文流失败 |
+| `CRYPTOX_STREAM_WRITE_FAILED` | unavailable | 写入密文或明文流失败 |
