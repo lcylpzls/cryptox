@@ -3,8 +3,8 @@ module github.com/lcylpzls/cryptox/examples
 go 1.26.5
 
 require (
-	github.com/lcylpzls/cryptox v0.6.7
-	github.com/lcylpzls/testx v1.2.3
+	github.com/lcylpzls/cryptox v1.0.0
+	github.com/lcylpzls/testx v1.4.1
 )
 
 require (
