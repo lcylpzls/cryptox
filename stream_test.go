@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/lcylpzls/errx"
+	"github.com/lcylpzls/testx"
 )
 
 func TestStreamRoundtrip(t *testing.T) {
@@ -71,17 +72,11 @@ func TestRotateKEKWithAAD(t *testing.T) {
 	oldKEK := bytes.Repeat([]byte("O"), 32)
 	newKEK := bytes.Repeat([]byte("N"), 32)
 	envelope, err := SealWithAAD(oldKEK, []byte("机密数据"), aad)
-	if err != nil {
-		t.Fatalf("SealWithAAD 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	rotated, err := RotateKEK(oldKEK, newKEK, envelope)
-	if err != nil {
-		t.Fatalf("RotateKEK 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	plain, err := OpenWithAAD(newKEK, rotated, aad)
-	if err != nil {
-		t.Fatalf("轮换后 OpenWithAAD 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if string(plain) != "机密数据" {
 		t.Fatalf("明文不匹配：%q", plain)
 	}

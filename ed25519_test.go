@@ -7,28 +7,23 @@ import (
 	"testing"
 
 	"github.com/lcylpzls/errx"
+	"github.com/lcylpzls/testx"
 )
 
 func TestEd25519Roundtrip(t *testing.T) {
 	priv, pub, err := GenerateEd25519Key()
-	if err != nil {
-		t.Fatalf("GenerateEd25519Key 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if len(priv) != ed25519.PrivateKeySize || len(pub) != ed25519.PublicKeySize {
 		t.Fatalf("密钥长度不匹配：priv=%d pub=%d", len(priv), len(pub))
 	}
 	derived, err := Ed25519PublicKey(priv)
-	if err != nil {
-		t.Fatalf("Ed25519PublicKey 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if !bytes.Equal(derived, pub) {
 		t.Fatal("导出的公钥与生成的不一致")
 	}
 	msg := []byte("签名消息")
 	sig, err := SignEd25519(priv, msg)
-	if err != nil {
-		t.Fatalf("SignEd25519 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if len(sig) != ed25519.SignatureSize {
 		t.Fatalf("签名长度应为 %d，得到 %d", ed25519.SignatureSize, len(sig))
 	}
@@ -82,22 +77,16 @@ func TestEd25519GenerateFailure(t *testing.T) {
 
 func TestParseEd25519Hex(t *testing.T) {
 	priv, pub, err := GenerateEd25519Key()
-	if err != nil {
-		t.Fatalf("GenerateEd25519Key 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	pubHex := hex.EncodeToString(pub)
 	parsedPub, err := ParseEd25519PublicKeyHex(pubHex)
-	if err != nil {
-		t.Fatalf("ParseEd25519PublicKeyHex 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if !bytes.Equal(parsedPub, pub) {
 		t.Fatal("解析公钥与原始不一致")
 	}
 	privHex := hex.EncodeToString(priv)
 	parsedPriv, err := ParseEd25519PrivateKeyHex(privHex)
-	if err != nil {
-		t.Fatalf("ParseEd25519PrivateKeyHex 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if !bytes.Equal(parsedPriv, priv) {
 		t.Fatal("解析私钥与原始不一致")
 	}

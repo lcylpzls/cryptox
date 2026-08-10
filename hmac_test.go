@@ -3,6 +3,7 @@ package cryptox
 import (
 	"bytes"
 	"encoding/hex"
+	"github.com/lcylpzls/testx"
 	"strings"
 	"testing"
 )
@@ -11,9 +12,7 @@ func TestSignVerifyHMAC(t *testing.T) {
 	key := []byte("hmac 密钥")
 	msg := []byte("待签名消息")
 	sig, err := SignHMAC(key, msg)
-	if err != nil {
-		t.Fatalf("SignHMAC 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if len(sig) != 32 {
 		t.Fatalf("签名长度应为 32，得到 %d", len(sig))
 	}
@@ -46,9 +45,7 @@ func TestSignHMACEmptyKey(t *testing.T) {
 
 func TestSignHMACEmptyMessage(t *testing.T) {
 	sig, err := SignHMAC([]byte("k"), nil)
-	if err != nil {
-		t.Fatalf("空消息签名失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if !VerifyHMAC([]byte("k"), nil, sig) {
 		t.Fatal("空消息签名应通过校验")
 	}
@@ -80,9 +77,7 @@ func TestSignHMACWithHashAllAlgorithms(t *testing.T) {
 	}
 	// 大小写与首尾空白应被容忍。
 	sig, err := SignHMACWithHash(" sha1 ", key, msg)
-	if err != nil {
-		t.Fatalf("大小写/空白归一失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if !VerifyHMACWithHash("SHA1", key, msg, sig) {
 		t.Fatal("归一化算法名签名应通过校验")
 	}
@@ -148,16 +143,12 @@ func TestSHA256(t *testing.T) {
 func TestSHA256Hex(t *testing.T) {
 	want := "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
 	got, err := SHA256Hex(strings.NewReader("abc"))
-	if err != nil {
-		t.Fatalf("SHA256Hex 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if got != want {
 		t.Fatalf("SHA256Hex 不匹配：%s", got)
 	}
 	got, err = SHA256Hex(strings.NewReader(""))
-	if err != nil {
-		t.Fatalf("SHA256Hex 空输入失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if !bytes.Equal(SHA256(nil), mustHex(got)) {
 		t.Fatalf("流式摘要与单次摘要不一致：%s", got)
 	}

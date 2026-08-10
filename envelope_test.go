@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/lcylpzls/errx"
+	"github.com/lcylpzls/testx"
 )
 
 var testKEK = []byte("0123456789abcdef0123456789abcdef")
@@ -18,13 +19,9 @@ func TestSealOpenRoundtrip(t *testing.T) {
 		bytes.Repeat([]byte("A"), 1024*1024+17),
 	} {
 		envelope, err := Seal(testKEK, plain)
-		if err != nil {
-			t.Fatalf("Seal 失败：%v", err)
-		}
+		testx.RequireNoError(t, err)
 		got, err := Open(testKEK, envelope)
-		if err != nil {
-			t.Fatalf("Open 失败：%v", err)
-		}
+		testx.RequireNoError(t, err)
 		if !bytes.Equal(got, plain) {
 			t.Fatalf("明文不一致：%d != %d", len(got), len(plain))
 		}
@@ -34,13 +31,9 @@ func TestSealOpenRoundtrip(t *testing.T) {
 func TestSealOpenWithAAD(t *testing.T) {
 	aad := []byte("object:orders/10086")
 	envelope, err := SealWithAAD(testKEK, []byte("机密数据"), aad)
-	if err != nil {
-		t.Fatalf("SealWithAAD 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	plain, err := OpenWithAAD(testKEK, envelope, aad)
-	if err != nil {
-		t.Fatalf("OpenWithAAD 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if string(plain) != "机密数据" {
 		t.Fatalf("明文不匹配：%q", plain)
 	}
@@ -52,13 +45,9 @@ func TestSealOpenWithAAD(t *testing.T) {
 
 func TestSealWithAADNilEquivalent(t *testing.T) {
 	withAAD, err := SealWithAAD(testKEK, []byte("x"), nil)
-	if err != nil {
-		t.Fatalf("SealWithAAD 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	plain, err := Open(testKEK, withAAD)
-	if err != nil {
-		t.Fatalf("aad 为 nil 时应可用 Open 解开：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if string(plain) != "x" {
 		t.Fatalf("明文不匹配：%q", plain)
 	}
@@ -66,24 +55,16 @@ func TestSealWithAADNilEquivalent(t *testing.T) {
 
 func TestSealUniqueNonce(t *testing.T) {
 	a, err := Seal(testKEK, []byte("相同明文"))
-	if err != nil {
-		t.Fatalf("Seal 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	b, err := Seal(testKEK, []byte("相同明文"))
-	if err != nil {
-		t.Fatalf("Seal 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if bytes.Equal(a, b) {
 		t.Fatal("两次 Seal 结果不应相同（nonce/DEK 应随机）")
 	}
 	pa, err := Open(testKEK, a)
-	if err != nil {
-		t.Fatalf("Open a 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	pb, err := Open(testKEK, b)
-	if err != nil {
-		t.Fatalf("Open b 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if !bytes.Equal(pa, pb) {
 		t.Fatal("两次 Open 明文应一致")
 	}
@@ -98,9 +79,7 @@ func TestSealInvalidKey(t *testing.T) {
 
 func TestOpenInvalidKey(t *testing.T) {
 	envelope, err := Seal(testKEK, []byte("x"))
-	if err != nil {
-		t.Fatalf("Seal 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	for _, kek := range [][]byte{nil, []byte("short")} {
 		_, err := Open(kek, envelope)
 		assertErrCode(t, err, CodeInvalidKey)
@@ -109,9 +88,7 @@ func TestOpenInvalidKey(t *testing.T) {
 
 func TestOpenDifferentKey(t *testing.T) {
 	envelope, err := Seal(testKEK, []byte("x"))
-	if err != nil {
-		t.Fatalf("Seal 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	other := bytes.Repeat([]byte("Z"), 32)
 	_, err = Open(other, envelope)
 	assertErrCode(t, err, CodeDecryptFailed)
@@ -119,9 +96,7 @@ func TestOpenDifferentKey(t *testing.T) {
 
 func TestOpenTampered(t *testing.T) {
 	envelope, err := Seal(testKEK, []byte("机密数据"))
-	if err != nil {
-		t.Fatalf("Seal 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	tamper := func(transform func([]byte) []byte) []byte {
 		cp := append([]byte(nil), envelope...)
 		return transform(cp)
@@ -167,9 +142,7 @@ func TestSealRandomFailure(t *testing.T) {
 
 func TestEncodeEnvelopeLayout(t *testing.T) {
 	envelope, err := Seal(testKEK, []byte("x"))
-	if err != nil {
-		t.Fatalf("Seal 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if string(envelope[:4]) != envelopeMagic {
 		t.Fatalf("magic 不匹配：%q", envelope[:4])
 	}

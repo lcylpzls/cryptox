@@ -6,22 +6,19 @@ import (
 	"testing"
 
 	"github.com/lcylpzls/errx"
+	"github.com/lcylpzls/testx"
 )
 
 func TestArgon2IDRoundtrip(t *testing.T) {
 	password := []byte("家庭式套件测试密码")
 	salt := bytes.Repeat([]byte{0x5a}, 16)
 	key, err := Argon2ID(password, salt, 8, 1, 1, 32)
-	if err != nil {
-		t.Fatalf("Argon2ID 派生失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if len(key) != 32 {
 		t.Fatalf("派生密钥长度应为 32，当前 %d", len(key))
 	}
 	other, err := Argon2ID(password, salt, 8, 1, 1, 32)
-	if err != nil {
-		t.Fatalf("Argon2ID 重复派生失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if !bytes.Equal(key, other) {
 		t.Fatal("相同参数派生结果不一致")
 	}
@@ -36,9 +33,7 @@ func TestArgon2IDRFC9106Vector(t *testing.T) {
 	// t=2、m=64 KiB、p=1、keyLen=24。
 	key, err := Argon2ID(
 		[]byte("password"), []byte("somesalt"), 64, 2, 1, 24)
-	if err != nil {
-		t.Fatalf("Argon2ID 派生失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	want := "068d62b26455936aa6ebe60060b0a65870dbfa3ddf8d41f7"
 	if got := hex.EncodeToString(key); got != want {
 		t.Fatalf("官方向量不匹配：got=%s want=%s", got, want)

@@ -2,6 +2,7 @@ package cryptox
 
 import (
 	"encoding/hex"
+	"github.com/lcylpzls/testx"
 	"strings"
 	"testing"
 )
@@ -15,9 +16,7 @@ func TestSHA256HexStreamingMatchesWriter(t *testing.T) {
 	}
 	gotHex := hex.EncodeToString(h.Sum(nil))
 	wantHex, err := SHA256Hex(strings.NewReader(input))
-	if err != nil {
-		t.Fatalf("SHA256Hex 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if gotHex != wantHex {
 		t.Fatalf("两条路径摘要不一致：%s != %s", gotHex, wantHex)
 	}
