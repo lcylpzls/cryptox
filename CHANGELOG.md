@@ -1,5 +1,21 @@
 # 更新日志
 
+## [v0.6.6] - 2026-08-10
+
+### 新增
+
+- `Argon2ID`：Argon2id 口令派生（RFC 9106），参数非法返回错误而非 panic；
+- `Argon2Version` 常量（v=19），供哈希串编码/解析使用；
+- `SignHMACWithHash` / `VerifyHMACWithHash`：支持 SHA1 / SHA256 / SHA512
+  的多算法 HMAC（供 TOTP 等场景）；
+- `NewSHA256`：SHA256 流式哈希器（兼容 `io.Writer`，供大文件边读边哈希）；
+- `Ed25519PublicKeySize` / `Ed25519PrivateKeySize` / `Ed25519SeedSize` /
+  `Ed25519SignatureSize` 尺寸常量。
+
+### 质量
+
+- 根包语句覆盖率保持 100%；race / vet / staticcheck / fuzz / govulncheck 全绿。
+
 ## [v0.6.5] - 2026-08-10
 
 ### 变更

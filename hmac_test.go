@@ -54,6 +54,53 @@ func TestSignHMACEmptyMessage(t *testing.T) {
 	}
 }
 
+func TestSignHMACWithHashAllAlgorithms(t *testing.T) {
+	key := []byte("hmac 密钥")
+	msg := []byte("待签名消息")
+	sizes := map[string]int{"SHA1": 20, "SHA256": 32, "SHA512": 64}
+	for name, size := range sizes {
+		t.Run(name, func(t *testing.T) {
+			sig, err := SignHMACWithHash(name, key, msg)
+			if err != nil {
+				t.Fatalf("SignHMACWithHash(%s) 失败：%v", name, err)
+			}
+			if len(sig) != size {
+				t.Fatalf("签名长度应为 %d，得到 %d", size, len(sig))
+			}
+			if !VerifyHMACWithHash(name, key, msg, sig) {
+				t.Fatal("合法签名应通过校验")
+			}
+			if VerifyHMACWithHash(name, key, msg, sig[:size-1]) {
+				t.Fatal("截断签名不应通过校验")
+			}
+			if VerifyHMACWithHash(name, key, []byte("篡改"), sig) {
+				t.Fatal("篡改消息不应通过校验")
+			}
+		})
+	}
+	// 大小写与首尾空白应被容忍。
+	sig, err := SignHMACWithHash(" sha1 ", key, msg)
+	if err != nil {
+		t.Fatalf("大小写/空白归一失败：%v", err)
+	}
+	if !VerifyHMACWithHash("SHA1", key, msg, sig) {
+		t.Fatal("归一化算法名签名应通过校验")
+	}
+}
+
+func TestSignHMACWithHashErrors(t *testing.T) {
+	_, err := SignHMACWithHash("MD5", []byte("k"), []byte("m"))
+	assertErrCode(t, err, CodeInvalidArgument)
+	_, err = SignHMACWithHash("SHA256", nil, []byte("m"))
+	assertErrCode(t, err, CodeInvalidKey)
+	if VerifyHMACWithHash("MD5", []byte("k"), []byte("m"), []byte("x")) {
+		t.Fatal("不支持算法应返回 false")
+	}
+	if VerifyHMACWithHash("SHA256", nil, []byte("m"), []byte("x")) {
+		t.Fatal("空密钥应返回 false")
+	}
+}
+
 func TestConstantTimeEquals(t *testing.T) {
 	if !ConstantTimeEquals(nil, nil) {
 		t.Fatal("空切片应相等")
@@ -66,6 +113,24 @@ func TestConstantTimeEquals(t *testing.T) {
 	}
 	if ConstantTimeEquals([]byte("abc"), []byte("abcd")) {
 		t.Fatal("不同长度不应相等")
+	}
+}
+
+func TestNewSHA256(t *testing.T) {
+	h := NewSHA256()
+	if _, err := h.Write([]byte("abc")); err != nil {
+		t.Fatalf("流式写入失败：%v", err)
+	}
+	if got := hex.EncodeToString(h.Sum(nil)); got != "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad" {
+		t.Fatalf("流式 SHA256 不匹配：%s", got)
+	}
+	// 新实例互不影响。
+	h2 := NewSHA256()
+	if _, err := h2.Write([]byte("x")); err != nil {
+		t.Fatalf("第二个实例写入失败：%v", err)
+	}
+	if !bytes.Equal(h.Sum(nil), SHA256([]byte("abc"))) {
+		t.Fatal("流式摘要应与单次摘要一致")
 	}
 }
 

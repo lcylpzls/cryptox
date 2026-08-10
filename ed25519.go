@@ -8,6 +8,18 @@ import (
 	"github.com/lcylpzls/errx"
 )
 
+// Ed25519 密钥与签名的标准字节长度。
+const (
+	// Ed25519PublicKeySize 公钥字节数。
+	Ed25519PublicKeySize = ed25519.PublicKeySize
+	// Ed25519PrivateKeySize 私钥字节数（种子 + 公钥）。
+	Ed25519PrivateKeySize = ed25519.PrivateKeySize
+	// Ed25519SeedSize 私钥种子字节数。
+	Ed25519SeedSize = ed25519.SeedSize
+	// Ed25519SignatureSize 签名字节数。
+	Ed25519SignatureSize = ed25519.SignatureSize
+)
+
 // GenerateEd25519Key 生成 Ed25519 密钥对：
 // 私钥 64 字节（种子 + 公钥），公钥 32 字节。
 func GenerateEd25519Key() (priv, pub []byte, err error) {

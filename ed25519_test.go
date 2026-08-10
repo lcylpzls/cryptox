@@ -132,3 +132,12 @@ func TestParseEd25519HexErrors(t *testing.T) {
 		})
 	}
 }
+
+func TestEd25519Sizes(t *testing.T) {
+	if Ed25519PublicKeySize != 32 || Ed25519PrivateKeySize != 64 ||
+		Ed25519SeedSize != 32 || Ed25519SignatureSize != 64 {
+		t.Fatalf("Ed25519 尺寸常量非法：pub=%d priv=%d seed=%d sig=%d",
+			Ed25519PublicKeySize, Ed25519PrivateKeySize,
+			Ed25519SeedSize, Ed25519SignatureSize)
+	}
+}

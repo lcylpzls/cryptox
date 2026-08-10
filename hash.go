@@ -3,10 +3,16 @@ package cryptox
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"hash"
 	"io"
 
 	"github.com/lcylpzls/errx"
 )
+
+// NewSHA256 返回 SHA256 流式哈希器（兼容 io.Writer），用于边读边哈希大块数据。
+func NewSHA256() hash.Hash {
+	return sha256.New()
+}
 
 // SHA256 计算字节切片的 SHA256 摘要（32 字节）。
 func SHA256(data []byte) []byte {
