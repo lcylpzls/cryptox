@@ -37,3 +37,12 @@ func FuzzDecryptStream(f *testing.F) {
 		_ = DecryptStream(testKEK, io.Discard, bytes.NewReader(data))
 	})
 }
+
+// FuzzVerifyHMAC 验证任意密钥/消息/签名输入下校验不 panic。
+func FuzzVerifyHMAC(f *testing.F) {
+	f.Add([]byte("key"), []byte("msg"), []byte("sig"))
+	f.Add([]byte(nil), []byte(nil), []byte(nil))
+	f.Fuzz(func(t *testing.T, key, msg, sig []byte) {
+		_ = VerifyHMAC(key, msg, sig)
+	})
+}

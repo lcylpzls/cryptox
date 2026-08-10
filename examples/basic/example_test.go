@@ -2,6 +2,7 @@ package basic_test
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/lcylpzls/cryptox"
@@ -31,5 +32,20 @@ func TestExampleSealOpen(t *testing.T) {
 	}
 	if !bytes.Equal(decrypted.Bytes(), []byte("大文件内容")) {
 		t.Fatalf("流式明文不匹配：%q", decrypted.String())
+	}
+
+	sig, err := cryptox.SignHMAC(kek, []byte("消息"))
+	if err != nil {
+		t.Fatalf("SignHMAC 失败：%v", err)
+	}
+	if !cryptox.VerifyHMAC(kek, []byte("消息"), sig) {
+		t.Fatal("HMAC 校验失败")
+	}
+	digest, err := cryptox.SHA256Hex(strings.NewReader("abc"))
+	if err != nil {
+		t.Fatalf("SHA256Hex 失败：%v", err)
+	}
+	if len(digest) != 64 {
+		t.Fatalf("摘要长度应为 64，得到 %d", len(digest))
 	}
 }

@@ -1,8 +1,8 @@
 # API 快照
 
-> 随版本更新。v0.2.0 快照如下；新版本发布后同步替换。
+> 随版本更新。v0.3.0 快照如下；新版本发布后同步替换。
 
-## v0.2.0
+## v0.3.0
 
 ### 信封加密
 
@@ -44,6 +44,21 @@ func DecryptStream(kek []byte, dst io.Writer, src io.Reader) error
 数据：块序列，每块 [4B 密文长度][密文+标签]
 ```
 
+### 对称认证与摘要
+
+```go
+func SignHMAC(key, msg []byte) ([]byte, error)
+func VerifyHMAC(key, msg, sig []byte) bool
+func ConstantTimeEquals(a, b []byte) bool
+func SHA256(data []byte) []byte
+func SHA256Hex(r io.Reader) (string, error)
+```
+
+- `SignHMAC` 使用 HMAC-SHA256，返回 32 字节签名；密钥必须非空；
+- `VerifyHMAC` 常量时间校验，密钥为空或签名不匹配返回 false；
+- `SHA256Hex` 流式计算摘要（小写十六进制），适合大文件；
+- 摘要计算读取失败返回 `CRYPTOX_HASH_FAILED`。
+
 ### 错误码
 
 | 错误码 | 分类 | 含义 |
@@ -56,3 +71,4 @@ func DecryptStream(kek []byte, dst io.Writer, src io.Reader) error
 | `CRYPTOX_INVALID_STREAM` | invalid | 加密流头部或块格式非法 |
 | `CRYPTOX_STREAM_READ_FAILED` | unavailable | 读取明文或密文流失败 |
 | `CRYPTOX_STREAM_WRITE_FAILED` | unavailable | 写入密文或明文流失败 |
+| `CRYPTOX_HASH_FAILED` | unavailable | 计算摘要失败 |

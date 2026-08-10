@@ -1,5 +1,19 @@
 # 更新日志
 
+## [v0.3.0] - 2026-08-10
+
+### 新增
+
+- HMAC-SHA256 签名/验签：`SignHMAC` / `VerifyHMAC`（常量时间）；
+- 常量时间比较：`ConstantTimeEquals`；
+- SHA256 摘要：`SHA256`（单次）与 `SHA256Hex`（流式、小写十六进制）；
+- 错误码：`CRYPTOX_HASH_FAILED`；
+- `FuzzVerifyHMAC` 接入 CI。
+
+### 质量
+
+- 根包语句覆盖率 100%；race / vet / staticcheck / fuzz / govulncheck 全绿。
+
 ## [v0.2.0] - 2026-08-10
 
 ### 新增

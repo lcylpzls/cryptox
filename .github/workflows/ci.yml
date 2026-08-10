@@ -114,6 +114,7 @@ jobs:
         run: |
           go test -run '^$' -fuzz '^FuzzOpen$' -fuzztime=5s .
           go test -run '^$' -fuzz '^FuzzDecryptStream$' -fuzztime=5s .
+          go test -run '^$' -fuzz '^FuzzVerifyHMAC$' -fuzztime=5s .
 
   vulncheck:
     runs-on: ubuntu-latest

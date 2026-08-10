@@ -20,6 +20,8 @@ const (
 	CodeStreamReadFailed errx.Code = "CRYPTOX_STREAM_READ_FAILED"
 	// CodeStreamWriteFailed 写入密文或明文流失败。
 	CodeStreamWriteFailed errx.Code = "CRYPTOX_STREAM_WRITE_FAILED"
+	// CodeHashFailed 计算摘要失败。
+	CodeHashFailed errx.Code = "CRYPTOX_HASH_FAILED"
 )
 
 func init() {
@@ -39,4 +41,6 @@ func init() {
 	errx.RegisterCodeKind(CodeStreamReadFailed, errx.KindUnavailable)
 	errx.RegisterCode(CodeStreamWriteFailed, "写入密文或明文流失败")
 	errx.RegisterCodeKind(CodeStreamWriteFailed, errx.KindUnavailable)
+	errx.RegisterCode(CodeHashFailed, "计算摘要失败")
+	errx.RegisterCodeKind(CodeHashFailed, errx.KindUnavailable)
 }
