@@ -36,6 +36,12 @@ var randomReader io.Reader = rand.Reader
 // 返回自包含的版本化信封。相同明文两次结果不同。
 // kek 必须是 16/24/32 字节的 AES 密钥，推荐 32 字节。
 func Seal(kek, plaintext []byte) ([]byte, error) {
+	return SealWithAAD(kek, plaintext, nil)
+}
+
+// SealWithAAD 与 Seal 相同，但将 aad（附加认证数据）绑定到数据密文：
+// 绑定用途/路径/上下文后，密文无法被置换到其他场景。
+func SealWithAAD(kek, plaintext, aad []byte) ([]byte, error) {
 	block, err := aes.NewCipher(kek)
 	if err != nil {
 		return nil, errx.WrapCode(err, CodeInvalidKey, "主密钥非法（需 16/24/32 字节）")
@@ -51,13 +57,19 @@ func Seal(kek, plaintext []byte) ([]byte, error) {
 	wrapped := sealGCM(block, keyNonce, dek, nil)
 	// DEK 固定 32 字节，aes.NewCipher 不会失败。
 	dekBlock, _ := aes.NewCipher(dek)
-	ciphertext := sealGCM(dekBlock, dataNonce, plaintext, nil)
+	defer Wipe(dek)
+	ciphertext := sealGCM(dekBlock, dataNonce, plaintext, aad)
 	return encodeEnvelope(wrapped, keyNonce, dataNonce, ciphertext), nil
 }
 
 // Open 解开 Seal 生成的信封并返回明文。
 // 解密失败统一返回 CodeDecryptFailed，不区分密钥错误与篡改。
 func Open(kek, envelope []byte) ([]byte, error) {
+	return OpenWithAAD(kek, envelope, nil)
+}
+
+// OpenWithAAD 解开使用 SealWithAAD 生成的信封；aad 必须与加密时一致。
+func OpenWithAAD(kek, envelope, aad []byte) ([]byte, error) {
 	keyNonce, dataNonce, wrapped, ciphertext, err := parseEnvelopeHeader(envelope)
 	if err != nil {
 		return nil, err
@@ -72,7 +84,8 @@ func Open(kek, envelope []byte) ([]byte, error) {
 	}
 	// DEK 固定 32 字节，aes.NewCipher 不会失败。
 	dekBlock, _ := aes.NewCipher(dek)
-	plain, err := openGCM(dekBlock, dataNonce, ciphertext, nil)
+	defer Wipe(dek)
+	plain, err := openGCM(dekBlock, dataNonce, ciphertext, aad)
 	if err != nil {
 		return nil, errx.NewCode(CodeDecryptFailed, "解密失败")
 	}

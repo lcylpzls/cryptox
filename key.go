@@ -127,6 +127,7 @@ func RotateKEK(oldKEK, newKEK, envelope []byte) ([]byte, error) {
 	if err != nil {
 		return nil, errx.NewCode(CodeDecryptFailed, "解密失败")
 	}
+	defer Wipe(dek)
 	newBlock, err := aes.NewCipher(newKEK)
 	if err != nil {
 		return nil, errx.WrapCode(err, CodeInvalidKey, "新主密钥非法（需 16/24/32 字节）")

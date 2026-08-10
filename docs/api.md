@@ -1,20 +1,24 @@
 # API 快照
 
-> 随版本更新。v0.6.0 快照如下；新版本发布后同步替换。
+> 随版本更新。v0.6.1 快照如下；新版本发布后同步替换。
 
-## v0.6.0
+## v0.6.1
 
 ### 信封加密
 
 ```go
 func Seal(kek, plaintext []byte) ([]byte, error)
 func Open(kek, envelope []byte) ([]byte, error)
+func SealWithAAD(kek, plaintext, aad []byte) ([]byte, error)
+func OpenWithAAD(kek, envelope, aad []byte) ([]byte, error)
 ```
 
 - `Seal` 生成随机 DEK 并用主密钥包装，返回版本化信封；
   kek 必须为 16/24/32 字节，推荐 32 字节；
 - `Open` 解开信封；失败统一返回 `CRYPTOX_DECRYPT_FAILED`，
   不区分密钥错误与篡改；
+- `SealWithAAD` / `OpenWithAAD` 将附加认证数据绑定到数据密文，
+  防止密文被置换到其他用途/路径/上下文；
 - 信封可公开存储，密钥不在其中。
 
 ### 信封格式（v1）

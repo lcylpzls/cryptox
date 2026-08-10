@@ -31,6 +31,39 @@ func TestSealOpenRoundtrip(t *testing.T) {
 	}
 }
 
+func TestSealOpenWithAAD(t *testing.T) {
+	aad := []byte("object:orders/10086")
+	envelope, err := SealWithAAD(testKEK, []byte("机密数据"), aad)
+	if err != nil {
+		t.Fatalf("SealWithAAD 失败：%v", err)
+	}
+	plain, err := OpenWithAAD(testKEK, envelope, aad)
+	if err != nil {
+		t.Fatalf("OpenWithAAD 失败：%v", err)
+	}
+	if string(plain) != "机密数据" {
+		t.Fatalf("明文不匹配：%q", plain)
+	}
+	_, err = OpenWithAAD(testKEK, envelope, []byte("其他上下文"))
+	assertErrCode(t, err, CodeDecryptFailed)
+	_, err = Open(testKEK, envelope)
+	assertErrCode(t, err, CodeDecryptFailed)
+}
+
+func TestSealWithAADNilEquivalent(t *testing.T) {
+	withAAD, err := SealWithAAD(testKEK, []byte("x"), nil)
+	if err != nil {
+		t.Fatalf("SealWithAAD 失败：%v", err)
+	}
+	plain, err := Open(testKEK, withAAD)
+	if err != nil {
+		t.Fatalf("aad 为 nil 时应可用 Open 解开：%v", err)
+	}
+	if string(plain) != "x" {
+		t.Fatalf("明文不匹配：%q", plain)
+	}
+}
+
 func TestSealUniqueNonce(t *testing.T) {
 	a, err := Seal(testKEK, []byte("相同明文"))
 	if err != nil {

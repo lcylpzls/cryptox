@@ -1,5 +1,18 @@
 # 更新日志
 
+## [v0.6.1] - 2026-08-10
+
+### 新增
+
+- AAD 上下文绑定：`SealWithAAD` / `OpenWithAAD`，
+  将用途/路径/上下文绑定到数据密文，防止密文置换；
+- 内部 DEK 在 Seal / Open / EncryptStream / DecryptStream /
+  RotateKEK 返回前自动擦除（aes.NewCipher 已拷贝密钥，不影响解密）。
+
+### 质量
+
+- 根包语句覆盖率 100%；race / vet / staticcheck / fuzz / govulncheck 全绿。
+
 ## [v0.6.0] - 2026-08-10
 
 ### 新增

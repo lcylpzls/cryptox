@@ -3,6 +3,8 @@
 家族加密基座：信封加密、流式加密、签名、摘要与密钥管理辅助。
 全部基于 Go 标准库 crypto/*，不自研算法，与 errx / logx 家族打通。
 
+> 当前状态：**v0.6.x（1.0 候选）**；v1.0.0 是否发布由维护者决定。
+
 [![Go Version](https://img.shields.io/badge/Go-%3E%3D1.26-00ADD8?style=flat&logo=go)](https://go.dev/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![CI](https://github.com/lcylpzls/cryptox/actions/workflows/ci.yml/badge.svg)](https://github.com/lcylpzls/cryptox/actions/workflows/ci.yml)

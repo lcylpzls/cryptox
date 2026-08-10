@@ -44,6 +44,7 @@ func EncryptStream(kek []byte, dst io.Writer, src io.Reader) error {
 	}
 	// DEK 固定 32 字节，aes.NewCipher 不会失败。
 	dekBlock, _ := aes.NewCipher(dek)
+	defer Wipe(dek)
 	cw := &chunkWriter{
 		block:       dekBlock,
 		streamNonce: streamNonce,
@@ -95,6 +96,7 @@ func DecryptStream(kek []byte, dst io.Writer, src io.Reader) error {
 	}
 	// DEK 固定 32 字节，aes.NewCipher 不会失败。
 	dekBlock, _ := aes.NewCipher(dek)
+	defer Wipe(dek)
 	streamNonce := append([]byte(nil), header[dataNonceOffset:wrappedKeyOffset]...)
 	var counter uint32
 	lenField := make([]byte, streamLenFieldLen)
