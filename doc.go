@@ -1,9 +1,3 @@
-// Package cryptox 是家族加密基座：信封加密、流式加密、签名、摘要、
-// 口令派生（PBKDF2 / Argon2id）与密钥管理辅助。
-// 全部基于 Go 标准库 crypto/* 与 x/crypto 的成熟实现，不自研算法。
-//
-// 典型用法：
-//
-//	envelope, err := cryptox.Seal(kek, []byte("机密数据"))
-//	plain, err := cryptox.Open(kek, envelope)
+// Package cryptox 提供加密基座（哈希、HMAC、Ed25519、AEAD 信封、流加密、密钥派生与擦除）。
+// 实现主体位于 internal/core，本包仅暴露稳定公开 API。
 package cryptox

@@ -1,4 +1,4 @@
-package cryptox
+package core
 
 import (
 	"crypto/aes"
