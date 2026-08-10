@@ -46,3 +46,17 @@ func FuzzVerifyHMAC(f *testing.F) {
 		_ = VerifyHMAC(key, msg, sig)
 	})
 }
+
+// FuzzVerifyEd25519 验证任意公钥/消息/签名输入下验签不 panic。
+func FuzzVerifyEd25519(f *testing.F) {
+	priv, pub, err := GenerateEd25519Key()
+	if err != nil {
+		f.Fatal(err)
+	}
+	sig, _ := SignEd25519(priv, []byte("msg"))
+	f.Add(pub, []byte("msg"), sig)
+	f.Add([]byte(nil), []byte(nil), []byte(nil))
+	f.Fuzz(func(t *testing.T, pub, msg, sig []byte) {
+		_ = VerifyEd25519(pub, msg, sig)
+	})
+}

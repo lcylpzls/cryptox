@@ -48,4 +48,16 @@ func TestExampleSealOpen(t *testing.T) {
 	if len(digest) != 64 {
 		t.Fatalf("摘要长度应为 64，得到 %d", len(digest))
 	}
+
+	priv, pub, err := cryptox.GenerateEd25519Key()
+	if err != nil {
+		t.Fatalf("GenerateEd25519Key 失败：%v", err)
+	}
+	sig, err = cryptox.SignEd25519(priv, []byte("消息"))
+	if err != nil {
+		t.Fatalf("SignEd25519 失败：%v", err)
+	}
+	if !cryptox.VerifyEd25519(pub, []byte("消息"), sig) {
+		t.Fatal("Ed25519 校验失败")
+	}
 }

@@ -1,5 +1,20 @@
 # 更新日志
 
+## [v0.4.0] - 2026-08-10
+
+### 新增
+
+- Ed25519 密钥生成：`GenerateEd25519Key`；
+- 签名/验签：`SignEd25519` / `VerifyEd25519`；
+- 公钥导出：`Ed25519PublicKey`；
+- hex 解析：`ParseEd25519PublicKeyHex` / `ParseEd25519PrivateKeyHex`；
+- 私钥长度非法统一返回 `CRYPTOX_INVALID_KEY`；
+- `FuzzVerifyEd25519` 接入 CI。
+
+### 质量
+
+- 根包语句覆盖率 100%；race / vet / staticcheck / fuzz / govulncheck 全绿。
+
 ## [v0.3.0] - 2026-08-10
 
 ### 新增

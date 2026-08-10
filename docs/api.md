@@ -1,8 +1,8 @@
 # API 快照
 
-> 随版本更新。v0.3.0 快照如下；新版本发布后同步替换。
+> 随版本更新。v0.4.0 快照如下；新版本发布后同步替换。
 
-## v0.3.0
+## v0.4.0
 
 ### 信封加密
 
@@ -58,6 +58,22 @@ func SHA256Hex(r io.Reader) (string, error)
 - `VerifyHMAC` 常量时间校验，密钥为空或签名不匹配返回 false；
 - `SHA256Hex` 流式计算摘要（小写十六进制），适合大文件；
 - 摘要计算读取失败返回 `CRYPTOX_HASH_FAILED`。
+
+### 非对称签名
+
+```go
+func GenerateEd25519Key() (priv, pub []byte, err error)
+func SignEd25519(priv, msg []byte) ([]byte, error)
+func VerifyEd25519(pub, msg, sig []byte) bool
+func Ed25519PublicKey(priv []byte) ([]byte, error)
+func ParseEd25519PublicKeyHex(s string) ([]byte, error)
+func ParseEd25519PrivateKeyHex(s string) ([]byte, error)
+```
+
+- 私钥 64 字节（种子 + 公钥），公钥 32 字节，签名 64 字节；
+- 私钥长度非法时签名/导出返回 `CRYPTOX_INVALID_KEY`；
+- `VerifyEd25519` 公钥长度非法或签名不匹配返回 false；
+- hex 解析支持小写/大写十六进制，长度错误返回 `CRYPTOX_INVALID_KEY`。
 
 ### 错误码
 
