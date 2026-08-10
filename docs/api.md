@@ -1,8 +1,8 @@
 # API 快照
 
-> 随版本更新。v0.6.1 快照如下；新版本发布后同步替换。
+> 随版本更新。v0.6.2 快照如下；新版本发布后同步替换。
 
-## v0.6.1
+## v0.6.2
 
 ### 信封加密
 
@@ -33,12 +33,15 @@ keyNonce (12B) | dataNonce (12B) | wrappedDEK (48B) | ciphertext
 ```go
 func EncryptStream(kek []byte, dst io.Writer, src io.Reader) error
 func DecryptStream(kek []byte, dst io.Writer, src io.Reader) error
+func EncryptStreamWithAAD(kek []byte, dst io.Writer, src io.Reader, aad []byte) error
+func DecryptStreamWithAAD(kek []byte, dst io.Writer, src io.Reader, aad []byte) error
 ```
 
 - 分块 AES-256-GCM（64 KiB/块），内存占用有界，适合大文件；
 - 流头部携带 KEK/DEK 信封与流随机数，块 nonce 由计数器派生；
 - 块格式：`[4B 长度][密文+标签]`；空流合法；
 - 块认证失败统一返回 `CRYPTOX_DECRYPT_FAILED`。
+- `*WithAAD` 将附加认证数据绑定到每个数据块，防止密文流置换。
 
 ### 流格式（v1）
 

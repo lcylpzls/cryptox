@@ -83,4 +83,16 @@ func TestExampleSealOpen(t *testing.T) {
 	if fields.Len() != 3 {
 		t.Fatalf("审计字段数量应为 3，得到 %d", fields.Len())
 	}
+
+	var aadStream bytes.Buffer
+	if err := cryptox.EncryptStreamWithAAD(kek, &aadStream, bytes.NewReader([]byte("带上下文数据")), []byte("backup")); err != nil {
+		t.Fatalf("EncryptStreamWithAAD 失败：%v", err)
+	}
+	var aadPlain bytes.Buffer
+	if err := cryptox.DecryptStreamWithAAD(kek, &aadPlain, bytes.NewReader(aadStream.Bytes()), []byte("backup")); err != nil {
+		t.Fatalf("DecryptStreamWithAAD 失败：%v", err)
+	}
+	if aadPlain.String() != "带上下文数据" {
+		t.Fatalf("AAD 流明文不匹配：%q", aadPlain.String())
+	}
 }

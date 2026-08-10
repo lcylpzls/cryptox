@@ -26,6 +26,12 @@ const (
 // 版本化流格式（KEK/DEK 信封 + 块计数器 nonce）。
 // 内存占用有界（单块大小），适合大文件。
 func EncryptStream(kek []byte, dst io.Writer, src io.Reader) error {
+	return EncryptStreamWithAAD(kek, dst, src, nil)
+}
+
+// EncryptStreamWithAAD 与 EncryptStream 相同，但将 aad 绑定到每个数据块，
+// 防止密文流被置换到其他用途/路径/上下文。
+func EncryptStreamWithAAD(kek []byte, dst io.Writer, src io.Reader, aad []byte) error {
 	block, err := aes.NewCipher(kek)
 	if err != nil {
 		return errx.WrapCode(err, CodeInvalidKey, "主密钥非法（需 16/24/32 字节）")
@@ -50,6 +56,7 @@ func EncryptStream(kek []byte, dst io.Writer, src io.Reader) error {
 		streamNonce: streamNonce,
 		dst:         dst,
 		buf:         make([]byte, 0, streamChunkSize),
+		aad:         aad,
 	}
 	buf := make([]byte, 64*1024)
 	for {
@@ -75,6 +82,12 @@ func EncryptStream(kek []byte, dst io.Writer, src io.Reader) error {
 // DecryptStream 读取 EncryptStream 生成的密文流并解密写入 dst。
 // 块认证失败统一返回 CodeDecryptFailed。
 func DecryptStream(kek []byte, dst io.Writer, src io.Reader) error {
+	return DecryptStreamWithAAD(kek, dst, src, nil)
+}
+
+// DecryptStreamWithAAD 解开 EncryptStreamWithAAD 生成的密文流；
+// aad 必须与加密时一致。
+func DecryptStreamWithAAD(kek []byte, dst io.Writer, src io.Reader, aad []byte) error {
 	header := make([]byte, streamHeaderSize)
 	if _, err := io.ReadFull(src, header); err != nil {
 		if errors.Is(err, io.EOF) {
@@ -115,7 +128,7 @@ func DecryptStream(kek []byte, dst io.Writer, src io.Reader) error {
 		if _, err := io.ReadFull(src, ct); err != nil {
 			return errx.WrapCode(err, CodeInvalidStream, "读取块密文失败")
 		}
-		plain, err := openGCM(dekBlock, chunkNonce(streamNonce, counter), ct, nil)
+		plain, err := openGCM(dekBlock, chunkNonce(streamNonce, counter), ct, aad)
 		if err != nil {
 			return errx.NewCode(CodeDecryptFailed, "解密失败")
 		}
@@ -173,6 +186,7 @@ type chunkWriter struct {
 	dst         io.Writer
 	buf         []byte
 	counter     uint32
+	aad         []byte
 }
 
 // Write 积累明文并按块加密写出。
@@ -197,7 +211,7 @@ func (w *chunkWriter) flush() error {
 
 // writeChunk 加密单块并写出 [4B 长度 + 密文]。
 func (w *chunkWriter) writeChunk(plain []byte) error {
-	ct := sealGCM(w.block, chunkNonce(w.streamNonce, w.counter), plain, nil)
+	ct := sealGCM(w.block, chunkNonce(w.streamNonce, w.counter), plain, w.aad)
 	w.counter++
 	lenField := make([]byte, streamLenFieldLen)
 	binary.BigEndian.PutUint32(lenField, uint32(len(ct)))

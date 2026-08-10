@@ -1,5 +1,22 @@
 # 更新日志
 
+## [v0.6.2] - 2026-08-10
+
+### 新增
+
+- 流式 AAD：`EncryptStreamWithAAD` / `DecryptStreamWithAAD`，
+  将用途/路径/上下文绑定到每个数据块，防止密文流置换；
+- 轮换与 AAD 组合测试：RotateKEK 后 AAD 绑定保持有效。
+
+### 结论
+
+- cryptox 达到 1.0 候选标准；**v1.0.0 是否发布由维护者决定**；
+- 1.0 确认后按 A/B/C 优先级接入家族各库。
+
+### 质量
+
+- 根包语句覆盖率 100%；race / vet / staticcheck / fuzz / govulncheck 全绿。
+
 ## [v0.6.1] - 2026-08-10
 
 ### 新增

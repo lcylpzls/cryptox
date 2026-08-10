@@ -32,6 +32,61 @@ func TestStreamUniqueNonce(t *testing.T) {
 	}
 }
 
+func TestStreamWithAAD(t *testing.T) {
+	aad := []byte("stream:backup-2026")
+	plain := bytes.Repeat([]byte("A"), streamChunkSize+17)
+	var stream bytes.Buffer
+	if err := EncryptStreamWithAAD(testKEK, &stream, bytes.NewReader(plain), aad); err != nil {
+		t.Fatalf("EncryptStreamWithAAD 失败：%v", err)
+	}
+	var got bytes.Buffer
+	if err := DecryptStreamWithAAD(testKEK, &got, bytes.NewReader(stream.Bytes()), aad); err != nil {
+		t.Fatalf("DecryptStreamWithAAD 失败：%v", err)
+	}
+	if !bytes.Equal(got.Bytes(), plain) {
+		t.Fatal("AAD 流明文不一致")
+	}
+	err := DecryptStreamWithAAD(testKEK, io.Discard, bytes.NewReader(stream.Bytes()), []byte("其他上下文"))
+	assertErrCode(t, err, CodeDecryptFailed)
+	err = DecryptStream(testKEK, io.Discard, bytes.NewReader(stream.Bytes()))
+	assertErrCode(t, err, CodeDecryptFailed)
+}
+
+func TestStreamAADNilEquivalent(t *testing.T) {
+	var withAAD bytes.Buffer
+	if err := EncryptStreamWithAAD(testKEK, &withAAD, bytes.NewReader([]byte("x")), nil); err != nil {
+		t.Fatalf("EncryptStreamWithAAD 失败：%v", err)
+	}
+	var got bytes.Buffer
+	if err := DecryptStream(testKEK, &got, bytes.NewReader(withAAD.Bytes())); err != nil {
+		t.Fatalf("aad 为 nil 时应可用 DecryptStream 解开：%v", err)
+	}
+	if got.String() != "x" {
+		t.Fatalf("明文不匹配：%q", got.String())
+	}
+}
+
+func TestRotateKEKWithAAD(t *testing.T) {
+	aad := []byte("object:orders/10086")
+	oldKEK := bytes.Repeat([]byte("O"), 32)
+	newKEK := bytes.Repeat([]byte("N"), 32)
+	envelope, err := SealWithAAD(oldKEK, []byte("机密数据"), aad)
+	if err != nil {
+		t.Fatalf("SealWithAAD 失败：%v", err)
+	}
+	rotated, err := RotateKEK(oldKEK, newKEK, envelope)
+	if err != nil {
+		t.Fatalf("RotateKEK 失败：%v", err)
+	}
+	plain, err := OpenWithAAD(newKEK, rotated, aad)
+	if err != nil {
+		t.Fatalf("轮换后 OpenWithAAD 失败：%v", err)
+	}
+	if string(plain) != "机密数据" {
+		t.Fatalf("明文不匹配：%q", plain)
+	}
+}
+
 func TestStreamInvalidKey(t *testing.T) {
 	for _, kek := range [][]byte{nil, []byte("short")} {
 		var buf bytes.Buffer
