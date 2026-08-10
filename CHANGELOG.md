@@ -1,5 +1,21 @@
 # 更新日志
 
+## [v0.5.0] - 2026-08-10
+
+### 新增
+
+- 密钥派生：`HKDF`（RFC 5869）与 `PBKDF2`（RFC 8018），
+  均基于标准库 HMAC-SHA256 实现并通过 RFC 测试向量验证；
+- 安全随机：`RandomBytes`；内存擦除：`Wipe`；
+- 主密钥轮换：`RotateKEK` 重新包装 DEK，密文不变、无需解出明文；
+- 错误码：`CRYPTOX_INVALID_ARGUMENT`；
+- `FuzzRotateKEK` 接入 CI；
+- 核心保持零第三方依赖（仅 errx）。
+
+### 质量
+
+- 根包语句覆盖率 100%；race / vet / staticcheck / fuzz / govulncheck 全绿。
+
 ## [v0.4.0] - 2026-08-10
 
 ### 新增

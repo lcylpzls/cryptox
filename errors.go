@@ -22,6 +22,8 @@ const (
 	CodeStreamWriteFailed errx.Code = "CRYPTOX_STREAM_WRITE_FAILED"
 	// CodeHashFailed 计算摘要失败。
 	CodeHashFailed errx.Code = "CRYPTOX_HASH_FAILED"
+	// CodeInvalidArgument 参数非法。
+	CodeInvalidArgument errx.Code = "CRYPTOX_INVALID_ARGUMENT"
 )
 
 func init() {
@@ -43,4 +45,6 @@ func init() {
 	errx.RegisterCodeKind(CodeStreamWriteFailed, errx.KindUnavailable)
 	errx.RegisterCode(CodeHashFailed, "计算摘要失败")
 	errx.RegisterCodeKind(CodeHashFailed, errx.KindUnavailable)
+	errx.RegisterCode(CodeInvalidArgument, "参数非法")
+	errx.RegisterCodeKind(CodeInvalidArgument, errx.KindInvalid)
 }

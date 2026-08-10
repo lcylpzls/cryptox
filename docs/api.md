@@ -1,8 +1,8 @@
 # API 快照
 
-> 随版本更新。v0.4.0 快照如下；新版本发布后同步替换。
+> 随版本更新。v0.5.0 快照如下；新版本发布后同步替换。
 
-## v0.4.0
+## v0.5.0
 
 ### 信封加密
 
@@ -75,6 +75,22 @@ func ParseEd25519PrivateKeyHex(s string) ([]byte, error)
 - `VerifyEd25519` 公钥长度非法或签名不匹配返回 false；
 - hex 解析支持小写/大写十六进制，长度错误返回 `CRYPTOX_INVALID_KEY`。
 
+### 密钥管理
+
+```go
+func HKDF(secret, salt, info []byte, length int) ([]byte, error)
+func PBKDF2(password, salt []byte, iterations, keyLen int) ([]byte, error)
+func RandomBytes(n int) ([]byte, error)
+func Wipe(b []byte)
+func RotateKEK(oldKEK, newKEK, envelope []byte) ([]byte, error)
+```
+
+- `HKDF` 为 RFC 5869（HMAC-SHA256），派生长度 1..8160 字节；
+- `PBKDF2` 为 RFC 8018（HMAC-SHA256），适合口令派生；
+- 两者均基于标准库实现，无第三方依赖，并通过 RFC 测试向量验证；
+- `RandomBytes` 生成安全随机数；`Wipe` 清零敏感内存；
+- `RotateKEK` 用新主密钥重新包装 DEK，密文不变，无需解出明文。
+
 ### 错误码
 
 | 错误码 | 分类 | 含义 |
@@ -88,3 +104,4 @@ func ParseEd25519PrivateKeyHex(s string) ([]byte, error)
 | `CRYPTOX_STREAM_READ_FAILED` | unavailable | 读取明文或密文流失败 |
 | `CRYPTOX_STREAM_WRITE_FAILED` | unavailable | 写入密文或明文流失败 |
 | `CRYPTOX_HASH_FAILED` | unavailable | 计算摘要失败 |
+| `CRYPTOX_INVALID_ARGUMENT` | invalid | 参数非法 |

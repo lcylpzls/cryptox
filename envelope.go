@@ -58,39 +58,50 @@ func Seal(kek, plaintext []byte) ([]byte, error) {
 // Open 解开 Seal 生成的信封并返回明文。
 // 解密失败统一返回 CodeDecryptFailed，不区分密钥错误与篡改。
 func Open(kek, envelope []byte) ([]byte, error) {
-	if len(envelope) < envelopeHeader {
-		return nil, errx.NewCode(CodeInvalidEnvelope, "信封长度不足")
-	}
-	if !bytes.Equal(envelope[:4], []byte(envelopeMagic)) {
-		return nil, errx.NewCode(CodeInvalidEnvelope, "信封标识不匹配")
-	}
-	if envelope[4] != envelopeVersion {
-		return nil, errx.NewCodef(CodeUnsupportedVersion, "不支持的信封版本 %d", envelope[4])
-	}
-	if envelope[5] != algorithmAES256GCM {
-		return nil, errx.NewCodef(CodeUnsupportedVersion, "不支持的加密算法 %d", envelope[5])
-	}
-	payloadLen := int(binary.BigEndian.Uint32(envelope[6:10]))
-	if payloadLen != len(envelope)-headerSize {
-		return nil, errx.NewCode(CodeInvalidEnvelope, "信封长度与声明不一致")
+	keyNonce, dataNonce, wrapped, ciphertext, err := parseEnvelopeHeader(envelope)
+	if err != nil {
+		return nil, err
 	}
 	block, err := aes.NewCipher(kek)
 	if err != nil {
 		return nil, errx.WrapCode(err, CodeInvalidKey, "主密钥非法（需 16/24/32 字节）")
 	}
-	dek, err := openGCM(block, envelope[keyNonceOffset:dataNonceOffset],
-		envelope[wrappedKeyOffset:envelopeHeader], nil)
+	dek, err := openGCM(block, keyNonce, wrapped, nil)
 	if err != nil {
 		return nil, errx.NewCode(CodeDecryptFailed, "解密失败")
 	}
 	// DEK 固定 32 字节，aes.NewCipher 不会失败。
 	dekBlock, _ := aes.NewCipher(dek)
-	plain, err := openGCM(dekBlock, envelope[dataNonceOffset:wrappedKeyOffset],
-		envelope[envelopeHeader:], nil)
+	plain, err := openGCM(dekBlock, dataNonce, ciphertext, nil)
 	if err != nil {
 		return nil, errx.NewCode(CodeDecryptFailed, "解密失败")
 	}
 	return plain, nil
+}
+
+// parseEnvelopeHeader 校验并解析信封头部，返回各组成部分。
+func parseEnvelopeHeader(envelope []byte) (keyNonce, dataNonce, wrapped, ciphertext []byte, err error) {
+	if len(envelope) < envelopeHeader {
+		return nil, nil, nil, nil, errx.NewCode(CodeInvalidEnvelope, "信封长度不足")
+	}
+	if !bytes.Equal(envelope[:4], []byte(envelopeMagic)) {
+		return nil, nil, nil, nil, errx.NewCode(CodeInvalidEnvelope, "信封标识不匹配")
+	}
+	if envelope[4] != envelopeVersion {
+		return nil, nil, nil, nil, errx.NewCodef(CodeUnsupportedVersion, "不支持的信封版本 %d", envelope[4])
+	}
+	if envelope[5] != algorithmAES256GCM {
+		return nil, nil, nil, nil, errx.NewCodef(CodeUnsupportedVersion, "不支持的加密算法 %d", envelope[5])
+	}
+	payloadLen := int(binary.BigEndian.Uint32(envelope[6:10]))
+	if payloadLen != len(envelope)-headerSize {
+		return nil, nil, nil, nil, errx.NewCode(CodeInvalidEnvelope, "信封长度与声明不一致")
+	}
+	return envelope[keyNonceOffset:dataNonceOffset],
+		envelope[dataNonceOffset:wrappedKeyOffset],
+		envelope[wrappedKeyOffset:envelopeHeader],
+		envelope[envelopeHeader:],
+		nil
 }
 
 // encodeEnvelope 按 v1 格式编码信封。

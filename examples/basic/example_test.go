@@ -60,4 +60,23 @@ func TestExampleSealOpen(t *testing.T) {
 	if !cryptox.VerifyEd25519(pub, []byte("消息"), sig) {
 		t.Fatal("Ed25519 校验失败")
 	}
+
+	derived, err := cryptox.HKDF(kek, nil, []byte("派生"), 32)
+	if err != nil {
+		t.Fatalf("HKDF 失败：%v", err)
+	}
+	if len(derived) != 32 {
+		t.Fatalf("HKDF 派生长度应为 32，得到 %d", len(derived))
+	}
+	rotated, err := cryptox.RotateKEK(kek, bytes.Repeat([]byte("Z"), 32), envelope)
+	if err != nil {
+		t.Fatalf("RotateKEK 失败：%v", err)
+	}
+	plain2, err := cryptox.Open(bytes.Repeat([]byte("Z"), 32), rotated)
+	if err != nil {
+		t.Fatalf("轮换后 Open 失败：%v", err)
+	}
+	if !bytes.Equal(plain2, []byte("机密数据")) {
+		t.Fatalf("轮换后明文不匹配：%q", plain2)
+	}
 }

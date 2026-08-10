@@ -60,3 +60,18 @@ func FuzzVerifyEd25519(f *testing.F) {
 		_ = VerifyEd25519(pub, msg, sig)
 	})
 }
+
+// FuzzRotateKEK 验证任意信封字节输入下轮换不 panic。
+func FuzzRotateKEK(f *testing.F) {
+	envelope, err := Seal(testKEK, []byte("fuzz 数据"))
+	if err != nil {
+		f.Fatal(err)
+	}
+	newKEK := bytes.Repeat([]byte("N"), 32)
+	f.Add(envelope)
+	f.Add(envelope[:10])
+	f.Add([]byte{})
+	f.Fuzz(func(t *testing.T, data []byte) {
+		_, _ = RotateKEK(testKEK, newKEK, data)
+	})
+}
