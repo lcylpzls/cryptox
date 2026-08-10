@@ -1,5 +1,17 @@
 # 更新日志
 
+## [v0.6.7] - 2026-08-10
+
+### 修复
+
+- `Argon2ID` 参数透传顺序修正：底层 `argon2.IDKey` 参数顺序为
+  (time, memory, threads, keyLen)，现与文档（memory 在前）保持一致，
+  并新增 RFC 9106 官方向量回归测试（v0.6.6 的该函数不可用，请升级）。
+
+### 质量
+
+- 根包语句覆盖率保持 100%；race / vet / staticcheck / fuzz / govulncheck 全绿。
+
 ## [v0.6.6] - 2026-08-10
 
 ### 新增

@@ -23,6 +23,7 @@ func Argon2ID(password, salt []byte, memory, iterations uint32, parallelism uint
 	case keyLen == 0:
 		return nil, errx.NewCode(CodeInvalidArgument, "Argon2 派生密钥长度必须为正")
 	default:
-		return argon2.IDKey(password, salt, memory, iterations, parallelism, keyLen), nil
+		// argon2.IDKey 参数顺序为 (time, memory, threads, keyLen)。
+		return argon2.IDKey(password, salt, iterations, memory, parallelism, keyLen), nil
 	}
 }

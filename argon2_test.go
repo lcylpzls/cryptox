@@ -2,6 +2,7 @@ package cryptox
 
 import (
 	"bytes"
+	"encoding/hex"
 	"testing"
 
 	"github.com/lcylpzls/errx"
@@ -27,6 +28,20 @@ func TestArgon2IDRoundtrip(t *testing.T) {
 	// 与 RFC 9106 已知向量一致：相同参数结果确定且可复现。
 	if Argon2Version != 19 {
 		t.Fatalf("Argon2 版本号应为 19，当前 %d", Argon2Version)
+	}
+}
+
+func TestArgon2IDRFC9106Vector(t *testing.T) {
+	// RFC 9106 / x/crypto 官方向量：password="password"、salt="somesalt"、
+	// t=2、m=64 KiB、p=1、keyLen=24。
+	key, err := Argon2ID(
+		[]byte("password"), []byte("somesalt"), 64, 2, 1, 24)
+	if err != nil {
+		t.Fatalf("Argon2ID 派生失败：%v", err)
+	}
+	want := "068d62b26455936aa6ebe60060b0a65870dbfa3ddf8d41f7"
+	if got := hex.EncodeToString(key); got != want {
+		t.Fatalf("官方向量不匹配：got=%s want=%s", got, want)
 	}
 }
 
