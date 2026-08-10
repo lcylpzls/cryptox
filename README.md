@@ -5,7 +5,7 @@
 
 > 当前状态：**v0.6.x（1.0 候选）**；v1.0.0 是否发布由维护者决定。
 
-[![Go Version](https://img.shields.io/badge/Go-%3E%3D1.26-00ADD8?style=flat&logo=go)](https://go.dev/)
+[![Go Version](https://img.shields.io/badge/Go-%3E%3D1.26.5-00ADD8?style=flat&logo=go)](https://go.dev/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![CI](https://github.com/lcylpzls/cryptox/actions/workflows/ci.yml/badge.svg)](https://github.com/lcylpzls/cryptox/actions/workflows/ci.yml)
 

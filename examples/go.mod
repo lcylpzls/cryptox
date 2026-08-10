@@ -1,6 +1,6 @@
 module github.com/lcylpzls/cryptox/examples
 
-go 1.21
+go 1.26.5
 
 require github.com/lcylpzls/cryptox v0.6.1
 
