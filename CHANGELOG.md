@@ -1,5 +1,24 @@
 # 更新日志
 
+## [v0.6.0] - 2026-08-10
+
+### 新增
+
+- logx 审计字段：`AuditFields` 输出操作/算法/规模与 errx 错误字段，
+  密钥材料绝不入日志；
+- 操作标识常量（seal/open/stream/sign/derive/rotate 等）；
+- `docs/errors.md` 错误码手册与 `docs/final-review.md` 终审清单；
+- Issue 模板与 README CI 徽章；
+- 基准测试（信封/流式/HMAC/PBKDF2）。
+
+### 结论
+
+- cryptox 达到 1.0 候选标准；**v1.0.0 是否发布由维护者决定**。
+
+### 质量
+
+- 根包语句覆盖率 100%；race / vet / staticcheck / fuzz / govulncheck 全绿。
+
 ## [v0.5.0] - 2026-08-10
 
 ### 新增

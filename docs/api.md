@@ -1,8 +1,8 @@
 # API 快照
 
-> 随版本更新。v0.5.0 快照如下；新版本发布后同步替换。
+> 随版本更新。v0.6.0 快照如下；新版本发布后同步替换。
 
-## v0.5.0
+## v0.6.0
 
 ### 信封加密
 
@@ -90,6 +90,21 @@ func RotateKEK(oldKEK, newKEK, envelope []byte) ([]byte, error)
 - 两者均基于标准库实现，无第三方依赖，并通过 RFC 测试向量验证；
 - `RandomBytes` 生成安全随机数；`Wipe` 清零敏感内存；
 - `RotateKEK` 用新主密钥重新包装 DEK，密文不变，无需解出明文。
+
+### 审计字段
+
+```go
+func AuditFields(operation, algorithm string, size int, err error) logx.FieldGroup
+```
+
+- 输出 `crypto.operation` / `crypto.algorithm` / `crypto.size`，
+  err 非 nil 时附带 errx 结构化错误字段；
+- 绝不包含密钥材料；
+- 操作标识常量：`OperationSeal` / `OperationOpen` /
+  `OperationEncryptStream` / `OperationDecryptStream` /
+  `OperationSignHMAC` / `OperationVerifyHMAC` /
+  `OperationSignEd25519` / `OperationVerifyEd25519` /
+  `OperationDeriveKey` / `OperationRotateKEK`。
 
 ### 错误码
 

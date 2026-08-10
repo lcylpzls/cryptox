@@ -79,4 +79,8 @@ func TestExampleSealOpen(t *testing.T) {
 	if !bytes.Equal(plain2, []byte("机密数据")) {
 		t.Fatalf("轮换后明文不匹配：%q", plain2)
 	}
+	fields := cryptox.AuditFields(cryptox.OperationOpen, "AES-256-GCM", len(envelope), nil)
+	if fields.Len() != 3 {
+		t.Fatalf("审计字段数量应为 3，得到 %d", fields.Len())
+	}
 }
