@@ -3,6 +3,7 @@ package cryptox_test
 import (
 	"bytes"
 	"crypto/rand"
+	"encoding/hex"
 	"testing"
 
 	"github.com/lcylpzls/cryptox"
@@ -89,8 +90,8 @@ func TestPublicAPI(t *testing.T) {
 	if len(sum) != 32 {
 		t.Fatal("SHA256 长度错误")
 	}
-	hex, _ := cryptox.SHA256Hex(bytes.NewReader(plain))
-	if hex == "" {
+	hexStr, _ := cryptox.SHA256Hex(bytes.NewReader(plain))
+	if hexStr == "" {
 		t.Fatal("SHA256Hex 为空")
 	}
 
@@ -106,10 +107,39 @@ func TestPublicAPI(t *testing.T) {
 		t.Fatal("ConstantTimeEquals 失败")
 	}
 
+	xpriv, xpub, err := cryptox.GenerateX25519Key()
+	if err != nil || len(xpriv) != cryptox.X25519PrivateKeySize || len(xpub) != cryptox.X25519PublicKeySize {
+		t.Fatalf("GenerateX25519Key 失败：%v", err)
+	}
+	xpub2, err := cryptox.X25519PublicKey(xpriv)
+	if err != nil || !bytes.Equal(xpub, xpub2) {
+		t.Fatalf("X25519PublicKey 不一致：%v", err)
+	}
+	xpriv2, xpub3, err := cryptox.GenerateX25519Key()
+	if err != nil {
+		t.Fatalf("GenerateX25519Key 失败：%v", err)
+	}
+	xs1, err := cryptox.X25519SharedSecret(xpriv, xpub3)
+	if err != nil {
+		t.Fatalf("X25519SharedSecret 失败：%v", err)
+	}
+	xs2, err := cryptox.X25519SharedSecret(xpriv2, xpub)
+	if err != nil {
+		t.Fatalf("X25519SharedSecret 失败：%v", err)
+	}
+	if len(xs1) != cryptox.X25519SharedSecretSize || !bytes.Equal(xs1, xs2) {
+		t.Fatal("X25519 共享密钥不一致")
+	}
+	_, _ = cryptox.ParseX25519PublicKeyHex(hex.EncodeToString(xpub))
+	_, _ = cryptox.ParseX25519PrivateKeyHex(hex.EncodeToString(xpriv))
+
 	_ = cryptox.Ed25519PublicKeySize
 	_ = cryptox.Ed25519PrivateKeySize
 	_ = cryptox.Ed25519SeedSize
 	_ = cryptox.Ed25519SignatureSize
+	_ = cryptox.X25519PublicKeySize
+	_ = cryptox.X25519PrivateKeySize
+	_ = cryptox.X25519SharedSecretSize
 	_ = cryptox.OperationOpen
 	_ = cryptox.OperationEncryptStream
 	_ = cryptox.OperationDecryptStream
@@ -117,6 +147,8 @@ func TestPublicAPI(t *testing.T) {
 	_ = cryptox.OperationVerifyHMAC
 	_ = cryptox.OperationSignEd25519
 	_ = cryptox.OperationVerifyEd25519
+	_ = cryptox.OperationGenerateX25519
+	_ = cryptox.OperationX25519SharedSecret
 	_ = cryptox.OperationDeriveKey
 	_ = cryptox.OperationRotateKEK
 	_ = cryptox.CodeInvalidKey

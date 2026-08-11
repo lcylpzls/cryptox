@@ -15,19 +15,27 @@ const (
 	Ed25519SignatureSize  = core.Ed25519SignatureSize
 )
 
+const (
+	X25519PublicKeySize    = core.X25519PublicKeySize
+	X25519PrivateKeySize   = core.X25519PrivateKeySize
+	X25519SharedSecretSize = core.X25519SharedSecretSize
+)
+
 const Argon2Version = core.Argon2Version
 
 const (
-	OperationSeal          = core.OperationSeal
-	OperationOpen          = core.OperationOpen
-	OperationEncryptStream = core.OperationEncryptStream
-	OperationDecryptStream = core.OperationDecryptStream
-	OperationSignHMAC      = core.OperationSignHMAC
-	OperationVerifyHMAC    = core.OperationVerifyHMAC
-	OperationSignEd25519   = core.OperationSignEd25519
-	OperationVerifyEd25519 = core.OperationVerifyEd25519
-	OperationDeriveKey     = core.OperationDeriveKey
-	OperationRotateKEK     = core.OperationRotateKEK
+	OperationSeal               = core.OperationSeal
+	OperationOpen               = core.OperationOpen
+	OperationEncryptStream      = core.OperationEncryptStream
+	OperationDecryptStream      = core.OperationDecryptStream
+	OperationSignHMAC           = core.OperationSignHMAC
+	OperationVerifyHMAC         = core.OperationVerifyHMAC
+	OperationSignEd25519        = core.OperationSignEd25519
+	OperationVerifyEd25519      = core.OperationVerifyEd25519
+	OperationGenerateX25519     = core.OperationGenerateX25519
+	OperationX25519SharedSecret = core.OperationX25519SharedSecret
+	OperationDeriveKey          = core.OperationDeriveKey
+	OperationRotateKEK          = core.OperationRotateKEK
 )
 
 const (
@@ -56,6 +64,15 @@ func Ed25519PublicKey(priv []byte) ([]byte, error)      { return core.Ed25519Pub
 func ParseEd25519PublicKeyHex(s string) ([]byte, error) { return core.ParseEd25519PublicKeyHex(s) }
 func ParseEd25519PrivateKeyHex(s string) ([]byte, error) {
 	return core.ParseEd25519PrivateKeyHex(s)
+}
+func GenerateX25519Key() (priv, pub []byte, err error) { return core.GenerateX25519Key() }
+func X25519PublicKey(priv []byte) ([]byte, error)      { return core.X25519PublicKey(priv) }
+func X25519SharedSecret(priv, peerPub []byte) ([]byte, error) {
+	return core.X25519SharedSecret(priv, peerPub)
+}
+func ParseX25519PublicKeyHex(s string) ([]byte, error) { return core.ParseX25519PublicKeyHex(s) }
+func ParseX25519PrivateKeyHex(s string) ([]byte, error) {
+	return core.ParseX25519PrivateKeyHex(s)
 }
 func Argon2ID(password, salt []byte, memory, iterations uint32, parallelism uint8, keyLen uint32) ([]byte, error) {
 	return core.Argon2ID(password, salt, memory, iterations, parallelism, keyLen)

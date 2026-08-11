@@ -1,5 +1,22 @@
 # 更新日志
 
+
+## [v1.3.0] - 2026-08-12
+
+### 新增
+
+- X25519 密钥交换能力：
+  - `GenerateX25519Key` 生成 32 字节密钥对；
+  - `X25519PublicKey` 从私钥推导公钥；
+  - `X25519SharedSecret` 计算 ECDH 共享密钥（含 RFC 7748 测试向量）；
+  - `ParseX25519PublicKeyHex` / `ParseX25519PrivateKeyHex` 十六进制解析；
+- 审计操作标识 `OperationGenerateX25519` /
+  `OperationX25519SharedSecret`。
+
+### 质量
+
+- 根包与 internal/core 语句覆盖率均 100%；race / vet / staticcheck 全绿。
+
 ## [v1.2.2] - 2026-08-11
 
 ### 文档

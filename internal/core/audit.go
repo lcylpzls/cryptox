@@ -6,16 +6,18 @@ import (
 
 // 加密操作标识，用于审计字段 crypto.operation。
 const (
-	OperationSeal          = "seal"
-	OperationOpen          = "open"
-	OperationEncryptStream = "encrypt_stream"
-	OperationDecryptStream = "decrypt_stream"
-	OperationSignHMAC      = "sign_hmac"
-	OperationVerifyHMAC    = "verify_hmac"
-	OperationSignEd25519   = "sign_ed25519"
-	OperationVerifyEd25519 = "verify_ed25519"
-	OperationDeriveKey     = "derive_key"
-	OperationRotateKEK     = "rotate_kek"
+	OperationSeal               = "seal"
+	OperationOpen               = "open"
+	OperationEncryptStream      = "encrypt_stream"
+	OperationDecryptStream      = "decrypt_stream"
+	OperationSignHMAC           = "sign_hmac"
+	OperationVerifyHMAC         = "verify_hmac"
+	OperationSignEd25519        = "sign_ed25519"
+	OperationVerifyEd25519      = "verify_ed25519"
+	OperationGenerateX25519     = "generate_x25519"
+	OperationX25519SharedSecret = "x25519_shared_secret"
+	OperationDeriveKey          = "derive_key"
+	OperationRotateKEK          = "rotate_kek"
 )
 
 // AuditFields 生成加密操作的 logx 审计字段：
