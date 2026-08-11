@@ -32,6 +32,7 @@ const (
 	OperationVerifyHMAC         = core.OperationVerifyHMAC
 	OperationSignEd25519        = core.OperationSignEd25519
 	OperationVerifyEd25519      = core.OperationVerifyEd25519
+	OperationDeriveEd25519      = core.OperationDeriveEd25519
 	OperationGenerateX25519     = core.OperationGenerateX25519
 	OperationX25519SharedSecret = core.OperationX25519SharedSecret
 	OperationDeriveKey          = core.OperationDeriveKey
@@ -58,6 +59,9 @@ func AuditFields(operation, algorithm string, size int, err error) logx.FieldGro
 	return core.AuditFields(operation, algorithm, size, err)
 }
 func GenerateEd25519Key() (priv, pub []byte, err error) { return core.GenerateEd25519Key() }
+func Ed25519PrivateKeyFromSeed(seed []byte) ([]byte, error) {
+	return core.Ed25519PrivateKeyFromSeed(seed)
+}
 func SignEd25519(priv, msg []byte) ([]byte, error)      { return core.SignEd25519(priv, msg) }
 func VerifyEd25519(pub, msg, sig []byte) bool           { return core.VerifyEd25519(pub, msg, sig) }
 func Ed25519PublicKey(priv []byte) ([]byte, error)      { return core.Ed25519PublicKey(priv) }

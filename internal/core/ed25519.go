@@ -30,6 +30,16 @@ func GenerateEd25519Key() (priv, pub []byte, err error) {
 	return []byte(privKey), []byte(pubKey), nil
 }
 
+// Ed25519PrivateKeyFromSeed 从 32 字节种子派生 64 字节 Ed25519 私钥。
+// 与标准库 ed25519.NewKeyFromSeed 语义一致，供由 seed 恢复签名密钥的场景使用。
+func Ed25519PrivateKeyFromSeed(seed []byte) ([]byte, error) {
+	if len(seed) != ed25519.SeedSize {
+		return nil, errx.NewCodef(CodeInvalidKey,
+			"Ed25519 种子长度必须为 %d 字节，当前 %d", ed25519.SeedSize, len(seed))
+	}
+	return []byte(ed25519.NewKeyFromSeed(seed)), nil
+}
+
 // SignEd25519 使用 Ed25519 私钥对消息签名，返回 64 字节签名。
 // 私钥必须为 64 字节。
 func SignEd25519(priv, msg []byte) ([]byte, error) {

@@ -75,6 +75,30 @@ func TestEd25519GenerateFailure(t *testing.T) {
 	assertErrCode(t, err, CodeRandomFailed)
 }
 
+func TestEd25519PrivateKeyFromSeed(t *testing.T) {
+	seed := bytes.Repeat([]byte{0xAB}, ed25519.SeedSize)
+	priv, err := Ed25519PrivateKeyFromSeed(seed)
+	testx.RequireNoError(t, err)
+	testx.RequireEqual(t, len(priv), ed25519.PrivateKeySize)
+
+	stdPriv := ed25519.NewKeyFromSeed(seed)
+	testx.RequireTrue(t, bytes.Equal(priv, []byte(stdPriv)))
+
+	// 派生私钥可正常签名验签。
+	msg := []byte("seed 签名")
+	sig, err := SignEd25519(priv, msg)
+	testx.RequireNoError(t, err)
+	pub, err := Ed25519PublicKey(priv)
+	testx.RequireNoError(t, err)
+	testx.RequireTrue(t, VerifyEd25519(pub, msg, sig))
+
+	for _, bad := range [][]byte{nil, make([]byte, 31), make([]byte, 33)} {
+		if _, err := Ed25519PrivateKeyFromSeed(bad); err == nil {
+			t.Fatal("种子长度非法应报错")
+		}
+	}
+}
+
 func TestParseEd25519Hex(t *testing.T) {
 	priv, pub, err := GenerateEd25519Key()
 	testx.RequireNoError(t, err)

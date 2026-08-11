@@ -53,6 +53,12 @@ func TestPublicAPI(t *testing.T) {
 	if err != nil || len(priv) == 0 || len(pub) == 0 {
 		t.Fatalf("GenerateEd25519Key 失败：%v", err)
 	}
+	seed := make([]byte, 32)
+	_, _ = rand.Read(seed)
+	seedPriv, err := cryptox.Ed25519PrivateKeyFromSeed(seed)
+	if err != nil || len(seedPriv) != cryptox.Ed25519PrivateKeySize {
+		t.Fatalf("Ed25519PrivateKeyFromSeed 失败：%v", err)
+	}
 	sig, _ := cryptox.SignEd25519(priv, plain)
 	if !cryptox.VerifyEd25519(pub, plain, sig) {
 		t.Fatal("VerifyEd25519 失败")
@@ -147,6 +153,7 @@ func TestPublicAPI(t *testing.T) {
 	_ = cryptox.OperationVerifyHMAC
 	_ = cryptox.OperationSignEd25519
 	_ = cryptox.OperationVerifyEd25519
+	_ = cryptox.OperationDeriveEd25519
 	_ = cryptox.OperationGenerateX25519
 	_ = cryptox.OperationX25519SharedSecret
 	_ = cryptox.OperationDeriveKey

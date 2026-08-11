@@ -16,6 +16,7 @@ const (
 	OperationVerifyEd25519      = "verify_ed25519"
 	OperationGenerateX25519     = "generate_x25519"
 	OperationX25519SharedSecret = "x25519_shared_secret"
+	OperationDeriveEd25519      = "derive_ed25519_private_key"
 	OperationDeriveKey          = "derive_key"
 	OperationRotateKEK          = "rotate_kek"
 )

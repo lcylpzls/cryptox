@@ -1,6 +1,15 @@
 # 更新日志
 
 
+## [v1.3.1] - 2026-08-12
+
+### 新增
+
+- `Ed25519PrivateKeyFromSeed(seed)`：从 32 字节 seed 派生 64 字节
+  Ed25519 私钥（校验 seed 长度），消除业务侧对标准库
+  `ed25519.NewKeyFromSeed` 的直接依赖；
+- 审计操作标识 `OperationDeriveEd25519`。
+
 ## [v1.3.0] - 2026-08-12
 
 ### 新增
