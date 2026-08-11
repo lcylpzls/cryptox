@@ -1,6 +1,23 @@
 # 更新日志
 
 
+
+## [v1.4.0] - 2026-08-12
+
+### 新增
+
+- 自签 TLS 证书生成：
+  - `SelfSignedCert(cn, dnsNames, ips, days)`（默认 Ed25519）；
+  - `SelfSignedCertWithOptions` 支持 `WithCertAlgorithm`
+    （Ed25519 / ECDSA P-256）与 `WithCertClock`；
+  - 输出证书 PEM 与 PKCS8 私钥 PEM，可直接用于
+    `tls.X509KeyPair` 与 `http.Server`；
+- 错误码 `CodeCertFailed`、审计标识 `OperationGenerateCert`。
+
+### 质量
+
+- 根包与 internal/core 语句覆盖率均 100%；race / vet / staticcheck 全绿。
+
 ## [v1.3.1] - 2026-08-12
 
 ### 新增

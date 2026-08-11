@@ -24,6 +24,8 @@ const (
 	CodeHashFailed errx.Code = "CRYPTOX_HASH_FAILED"
 	// CodeInvalidArgument 参数非法。
 	CodeInvalidArgument errx.Code = "CRYPTOX_INVALID_ARGUMENT"
+	// CodeCertFailed 证书生成或编码失败。
+	CodeCertFailed errx.Code = "CRYPTOX_CERT_FAILED"
 )
 
 func init() {
@@ -47,4 +49,6 @@ func init() {
 	errx.RegisterCodeKind(CodeHashFailed, errx.KindUnavailable)
 	errx.RegisterCode(CodeInvalidArgument, "参数非法")
 	errx.RegisterCodeKind(CodeInvalidArgument, errx.KindInvalid)
+	errx.RegisterCode(CodeCertFailed, "证书生成或编码失败")
+	errx.RegisterCodeKind(CodeCertFailed, errx.KindInternal)
 }

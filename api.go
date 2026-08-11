@@ -3,6 +3,8 @@ package cryptox
 import (
 	"hash"
 	"io"
+	"net"
+	"time"
 
 	"github.com/lcylpzls/cryptox/internal/core"
 	"github.com/lcylpzls/logx"
@@ -41,6 +43,19 @@ const (
 
 const (
 	CodeInvalidKey = core.CodeInvalidKey
+	CodeCertFailed = core.CodeCertFailed
+)
+
+const (
+	CertAlgorithmEd25519 = core.CertAlgorithmEd25519
+	CertAlgorithmECDSA   = core.CertAlgorithmECDSA
+)
+
+const OperationGenerateCert = core.OperationGenerateCert
+
+type (
+	CertAlgorithm = core.CertAlgorithm
+	CertOption    = core.CertOption
 )
 
 func EncryptStream(kek []byte, dst io.Writer, src io.Reader) error {
@@ -78,6 +93,14 @@ func ParseX25519PublicKeyHex(s string) ([]byte, error) { return core.ParseX25519
 func ParseX25519PrivateKeyHex(s string) ([]byte, error) {
 	return core.ParseX25519PrivateKeyHex(s)
 }
+func SelfSignedCert(cn string, dnsNames []string, ips []net.IP, days int) (certPEM, keyPEM []byte, err error) {
+	return core.SelfSignedCert(cn, dnsNames, ips, days)
+}
+func SelfSignedCertWithOptions(cn string, dnsNames []string, ips []net.IP, days int, opts ...CertOption) (certPEM, keyPEM []byte, err error) {
+	return core.SelfSignedCertWithOptions(cn, dnsNames, ips, days, opts...)
+}
+func WithCertAlgorithm(alg CertAlgorithm) CertOption { return core.WithCertAlgorithm(alg) }
+func WithCertClock(now func() time.Time) CertOption  { return core.WithCertClock(now) }
 func Argon2ID(password, salt []byte, memory, iterations uint32, parallelism uint8, keyLen uint32) ([]byte, error) {
 	return core.Argon2ID(password, salt, memory, iterations, parallelism, keyLen)
 }

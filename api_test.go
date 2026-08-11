@@ -3,8 +3,11 @@ package cryptox_test
 import (
 	"bytes"
 	"crypto/rand"
+	"crypto/tls"
 	"encoding/hex"
+	"net"
 	"testing"
+	"time"
 
 	"github.com/lcylpzls/cryptox"
 	"github.com/lcylpzls/errx"
@@ -139,6 +142,22 @@ func TestPublicAPI(t *testing.T) {
 	_, _ = cryptox.ParseX25519PublicKeyHex(hex.EncodeToString(xpub))
 	_, _ = cryptox.ParseX25519PrivateKeyHex(hex.EncodeToString(xpriv))
 
+	certPEM, keyPEM, err := cryptox.SelfSignedCert("localhost",
+		[]string{"localhost"}, []net.IP{net.ParseIP("127.0.0.1")}, 1)
+	if err != nil || len(certPEM) == 0 || len(keyPEM) == 0 {
+		t.Fatalf("SelfSignedCert 失败：%v", err)
+	}
+	if _, err := tls.X509KeyPair(certPEM, keyPEM); err != nil {
+		t.Fatalf("证书加载失败：%v", err)
+	}
+	_, _, err = cryptox.SelfSignedCertWithOptions("localhost", nil, nil, 1,
+		cryptox.WithCertAlgorithm(cryptox.CertAlgorithmECDSA),
+		cryptox.WithCertClock(time.Now),
+	)
+	if err != nil {
+		t.Fatalf("SelfSignedCertWithOptions 失败：%v", err)
+	}
+
 	_ = cryptox.Ed25519PublicKeySize
 	_ = cryptox.Ed25519PrivateKeySize
 	_ = cryptox.Ed25519SeedSize
@@ -156,6 +175,12 @@ func TestPublicAPI(t *testing.T) {
 	_ = cryptox.OperationDeriveEd25519
 	_ = cryptox.OperationGenerateX25519
 	_ = cryptox.OperationX25519SharedSecret
+	_ = cryptox.OperationGenerateCert
+	_ = cryptox.CodeCertFailed
+	_ = cryptox.CertAlgorithmEd25519
+	_ = cryptox.CertAlgorithmECDSA
+	var _ cryptox.CertAlgorithm
+	var _ cryptox.CertOption
 	_ = cryptox.OperationDeriveKey
 	_ = cryptox.OperationRotateKEK
 	_ = cryptox.CodeInvalidKey

@@ -11,6 +11,7 @@ cryptox（根包）
 ├── hash.go        SHA256 流式摘要（v0.3.0）
 ├── ed25519.go     Ed25519 密钥/签名/验签（v0.4.0）
 ├── x25519.go      X25519 密钥对/公钥推导/共享密钥（v1.3.0）
+├── cert.go        自签 TLS 证书（Ed25519/ECDSA，v1.4.0）
 ├── key.go         HKDF / PBKDF2 / RandomBytes / Wipe（v0.5.0）
 └── audit.go       logx 审计字段联动（v0.6.0）
 ```
