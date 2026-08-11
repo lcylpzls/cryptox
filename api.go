@@ -15,6 +15,8 @@ const (
 	Ed25519SignatureSize  = core.Ed25519SignatureSize
 )
 
+const Argon2Version = core.Argon2Version
+
 const (
 	OperationSeal          = core.OperationSeal
 	OperationOpen          = core.OperationOpen

@@ -120,4 +120,5 @@ func TestPublicAPI(t *testing.T) {
 	_ = cryptox.OperationDeriveKey
 	_ = cryptox.OperationRotateKEK
 	_ = cryptox.CodeInvalidKey
+	_ = cryptox.Argon2Version
 }
